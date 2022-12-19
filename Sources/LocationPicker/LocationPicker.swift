@@ -9,6 +9,12 @@ import SwiftUI
 import MapKit
 import MobileCoreServices
 
+extension CLLocationCoordinate2D: Equatable {
+    public static func == (lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+        return lhs.longitude == rhs.longitude && lhs.latitude == rhs.latitude
+    }
+}
+
 public struct LocationPicker: View {
     
     // MARK: - View properties
@@ -54,7 +60,7 @@ public struct LocationPicker: View {
                 if !instructions.isEmpty {
                     Text(self.instructions)
                         .padding()
-                        .background(VisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
+                        .background(VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialLight))
                         .cornerRadius(20))
                         .padding(.top, 10)
                 }
@@ -63,13 +69,19 @@ public struct LocationPicker: View {
                 
                 Text("\(coordinates.latitude), \(coordinates.longitude)")
                     .padding()
-                    .background(VisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial)).cornerRadius(20))
+                    .background(VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialLight)).cornerRadius(20))
                     .onTapGesture {
                         UIPasteboard.general.setValue("\(coordinates.latitude), \(coordinates.longitude)", forPasteboardType: kUTTypePlainText as String)
                     }
                 
             }.padding()
             
+        }.onChange(of: self.coordinates) { _ in
+            if self.dismissOnSelection {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    self.presentationMode.wrappedValue.dismiss()
+                }
+            }
         }
     }
 }
